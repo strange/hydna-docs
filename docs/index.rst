@@ -154,6 +154,8 @@ Or the same effect but more efficient::
 ``onrequest(request)``
 ~~~~~~~~~~~~~~~~~~~~~~
 
+Triggered when a HTTP request is made.
+
 
 ``onevent(request)``
 ~~~~~~~~~~~~~~~~~~~~~~
