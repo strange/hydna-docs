@@ -156,9 +156,45 @@ Or the same effect but more efficient::
 
 Triggered when a HTTP request is made.
 
+=============== =============================================================
+Attribute       Description
+=============== =============================================================
+``domain``      Name of the current domain (string)
+``bindings``    Any **bindings** extracted from the path (object)
+``path``        The current path (string)
+``querystring`` The raw querystring (string)
+``transport``   Name of the transport (``http`` or ``ws``) (string)
+``secure``      Booleand dictating whether the connection is encrypted
+                (boolean)
+``data``        The data sent (string)
+``resp(body)``  Respond to the request.
+=============== =============================================================
+
+Example::
+
+    function onrequest(req) {
+        req.resp("Hello world");
+    }
+
 
 ``onevent(request)``
 ~~~~~~~~~~~~~~~~~~~~~~
+
+Triggered when an event is dispatched on a path.
+
+=============== =============================================================
+Attribute       Description
+=============== =============================================================
+``domain``      Name of the current domain (string)
+``bindings``    Any **bindings** extracted from the path (object)
+``path``        The current path (string)
+``querystring`` The raw querystring (string)
+``transport``   Name of the transport (``http`` or ``ws``) (string)
+``secure``      Booleand dictating whether the connection is encrypted
+                (boolean)
+``data``        The data sent (string)
+``resp()``      Respond to the request.
+=============== =============================================================
 
 
 API
