@@ -68,6 +68,8 @@ contains the following:
 Attribute       Description
 =============== =============================================================
 ``domain``      Name of the current domain (string)
+``ref``         Unique reference of the connected client (string)
+``ip``          IP address of the connected client (string)
 ``bindings``    Any **bindings** extracted from the path (object)
 ``path``        The current path (string)
 ``querystring`` The raw querystring (string)
@@ -100,6 +102,7 @@ contains the following:
 Attribute       Description
 =============== =============================================================
 ``domain``      Name of the current domain (string)
+``ref``         Unique reference of the connected client (string)
 ``bindings``    Any **bindings** extracted from the path (object)
 ``path``        The current path (string)
 ``reason``      An optional reason for the event (string)
@@ -122,6 +125,8 @@ following:
 Attribute       Description
 =============== =============================================================
 ``domain``      Name of the current domain (string)
+``ref``         Unique reference of the connected client (string)
+``ip``          IP address of the connected client (string)
 ``bindings``    Any **bindings** extracted from the path (object)
 ``path``        The current path (string)
 ``querystring`` The raw querystring (string)
@@ -160,6 +165,8 @@ Triggered when a HTTP request is made.
 Attribute       Description
 =============== =============================================================
 ``domain``      Name of the current domain (string)
+``ref``         Unique reference of the connected client (string)
+``ip``          IP address of the connected client (string)
 ``bindings``    Any **bindings** extracted from the path (object)
 ``path``        The current path (string)
 ``querystring`` The raw querystring (string)
