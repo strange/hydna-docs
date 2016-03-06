@@ -196,6 +196,40 @@ Attribute       Description
 ``resp()``      Respond to the request.
 =============== =============================================================
 
+Agents
+------
+
+**Agents** are long-lived processes that trigger events on paths.
+
+``Tick agent``
+~~~~~~~~~~~~~~
+
+The tick-agent triggers an event on a path on interval. The event object has
+the following attributes:
+
+=============== =============================================================
+Attribute       Description
+=============== =============================================================
+``domain``      Name of the current domain (string)
+``bindings``    Any **bindings** extracted from the path (object)
+``path``        The current path (string)
+``querystring`` The raw querystring (string)
+``type``        Type of agent ('tick')
+``identifier``  Unique identifier of the agent (string)
+``interval``    Interval at which the agent is running
+=============== =============================================================
+
+Example handler::
+
+    function onevent(event) {
+        const url = 'http://quotes.stormconsultancy.co.uk/random.json';
+        http.get(url).then(function(resp) {
+            const quote = JSON.parse(resp.body);
+            const msg = `[quote] "${quote.quote}" by ${quote.author}\n`;
+            Channel.send(event.path, msg);
+        });
+    }
+
 
 API
 ---
