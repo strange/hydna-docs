@@ -216,6 +216,24 @@ Example::
     Channel.send('/world', 'Hello!');
 
 
+``Client``
+~~~~~~~~~~
+
+Rename to "Connection"?
+
+An api to interact with clients/connections. All functions in this module
+return a ``Promise``-instance.
+
+``Client.send(ref, message)``
+`````````````````````````````
+
+Send a `message` to a specific client identified by `ref`.
+
+Example::
+
+    Client.send(event.ref, "Welcome!");
+
+
 ``Http``
 ~~~~~~~~
 
