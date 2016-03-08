@@ -401,3 +401,197 @@ Example::
     }).catch(function(error) {
         console.log(error);
     });
+
+
+``Cache``
+~~~~~~~~
+
+An api to interact with domains key/value cache. All functions in this
+module return a ``Promise``-instance.
+
+``Cache.get(key)``
+``````````````````
+
+Gets value of ``key``.
+
+Example::
+
+    function onopen(event) {
+        Cache.get("welcome-message").then((value) => Channel.sendAfter(event.ref, 1, value));
+    }
+
+
+``Cache.set(key, value)``
+`````````````````````````
+
+Set ``key`` to ``value``.
+
+Example::
+
+    Cache.set("secret-key", "password")
+        .then(() => Console.log("Set was successfull"))
+        .catch((error) => Console.log("An error occured %s", error.message));
+
+
+``Cache.del(key)``
+`````````````````````````
+
+Permanently delete ``key``
+
+Example::
+
+    Cache.del("key").then(() => Console.log("Key is now deleted"));
+
+
+
+``Cache.incr(key, [max])``
+`````````````````````````
+
+Increase value associated with ``key`` bye one. The initial value is set to
+``0`` if the key does not exist.
+
+Example::
+
+    const MAX_CONNECTIONS = 10;
+    function onopen(event) {
+        Cache.incr("path-counter", MAX_CONNECTIONS)
+            .then(() => event.allow())
+            .catch(() => event.deny())
+    }
+
+
+``Cache.decr(key, [min])``
+`````````````````````````
+
+Works like ``incr()`` above, but decreases the value of ``key`` by one.
+
+Example::
+
+    function onclose(event) {
+        Cache.decr("path-counter");
+    }
+
+
+``Cache.push(key, value)``
+`````````````````````````
+
+Adds ``value`` to the end of list ``key``.
+
+Example::
+
+    function onmessage(event) {
+        if (event.data.startsWith("add-job")) {
+            const jobname = event.data.substr(6);
+            Cache.push("work-queue", jobname);
+        }
+    }
+
+
+
+``Cache.pop(key)``
+`````````````````````````
+
+Pop a value from the back of ``key``. Returns ``undefined`` if list is empty.
+
+Example::
+
+    function onevent(event) {
+        if (event.handler === "workqueue-tick") {
+            Cache.pop("work-queue").then((value) => {
+                if (value !== void(0)) {
+                    // Do something with job
+                }
+            });
+        }
+    }
+
+
+``Cache.unshift(key, value)``
+`````````````````````````
+
+Adds ``value`` to the begining of list ``key``.
+
+
+
+``Cache.shift(key)``
+````````````````````
+
+Pop a value from the front ``key``. Returns ``undefined`` if list is empty.
+
+
+
+``Cache.range(key, start, [length])``
+`````````````````````````
+
+Return a range of elements in list at ``key`` starting at ``start`` (inclusive,
+zero-based). If start is a negative number the range will start that many
+elements from the end of the list.
+
+
+``Cache.trim(key, start, [length])``
+````````````````````````````````````
+
+Works basically the same as range() (see above), but trims the list to contain
+only elements in the specified range (i.e. it removes all elements not in the
+range from the list).
+
+
+
+``Cache.hget(key, field)``
+```````````````````````````
+
+Gets value from ``field`` of hash ``key``.
+
+
+
+``Cache.hset(key, field, value)``
+`````````````````````````````````
+
+Set ``field`` of hash ``key`` to ``value``.
+
+
+Example::
+
+    function onopen(event) {
+        const username = event.querystring;
+        Cache.hset("connected-users", event.ref, username)
+            .then(() => event.allow())
+            .catch(() => event.deny());
+    }
+
+
+
+``Cache.hkeys(key, [pattern])``
+```````````````````````````
+
+Returns a list of all available fields matching optional ``pattern`` of
+hash ``key``.
+
+Example::
+
+    function onmessage(event) {
+        if (event.data === "list-users") {
+            Cache.hkeys("connected-users")
+                .then((keys) => Socket.send(event.ref, JSON.stringify(keys)));
+        }
+    }
+
+
+``Cache.hvalues(key, [pattern])``
+```````````````````````````````
+
+Returns a list of all available values which fields are matching optional
+``pattern`` of hash ``key``.
+
+
+``Cache.hdel(key, field)``
+```````````````````````````````
+
+Delete``field`` of hash ``key``.
+
+Example::
+
+    function onclose(event) {
+        Cache.hdel("connected-users", event.ref);
+    }
+
