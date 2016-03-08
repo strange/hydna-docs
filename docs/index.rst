@@ -561,11 +561,10 @@ Example::
 
 
 
-``Cache.hkeys(key, [pattern])``
+``Cache.hkeys(key)``
 ```````````````````````````
 
-Returns a list of all available fields matching optional ``pattern`` of
-hash ``key``.
+Returns a list of all available fields of hash ``key``.
 
 Example::
 
@@ -577,11 +576,10 @@ Example::
     }
 
 
-``Cache.hvalues(key, [pattern])``
+``Cache.hvalues(key)``
 ```````````````````````````````
 
-Returns a list of all available values which fields are matching optional
-``pattern`` of hash ``key``.
+Returns a list of all available values which fields of hash ``key``.
 
 
 ``Cache.hdel(key, field)``
