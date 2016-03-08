@@ -20,7 +20,7 @@ Send POST, GET, PUT or DELETE requests::
 
 Triggers the following handlers:
 
-- `onrequest`
+- ``onrequest``
 
 
 WebSocket
@@ -36,9 +36,9 @@ Connect with WebSocket::
 
 Triggers the following handlers:
 
-- `onopen`
-- `ondata`
-- `onclose`
+- ``onopen``
+- ``ondata``
+- ``onclose``
 
 
 EventSource
@@ -54,8 +54,8 @@ Connect with EventSource::
 
 Triggers the following handlers:
 
-- `onopen`
-- `onclose`
+- ``onopen``
+- ``onclose``
 
 
 Manifest
