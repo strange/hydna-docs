@@ -1,6 +1,63 @@
 Hydna2 documentation
 ====================
 
+Transports
+----------
+
+Hydna supports the following transports:
+
+- HTTP
+- WebSocket
+- EventSource
+
+
+HTTP
+~~~~
+
+Send POST, GET, PUT or DELETE requests::
+
+    curl -d test=fest http://127.0.0.1:8070/test/
+
+Triggers the following handlers:
+
+- `onrequest`
+
+
+WebSocket
+~~~~~~~~~
+
+Connect with WebSocket::
+
+    var ws = new WebSocket("ws://127.0.0.1:8070/test/");
+
+    ws.onmessage = function(event) {
+        console.log(event);
+    };
+
+Triggers the following handlers:
+
+- `onopen`
+- `ondata`
+- `onclose`
+
+
+EventSource
+~~~~~~~~~~~
+
+Connect with EventSource::
+
+    var es = new EventSource("http://127.0.0.1:8070/test/");
+
+    es.onmessage = function(event) {
+        console.log(event);
+    };
+
+Triggers the following handlers:
+
+- `onopen`
+- `onclose`
+
+
 Manifest
 --------
 
