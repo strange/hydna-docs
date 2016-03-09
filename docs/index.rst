@@ -353,18 +353,19 @@ Example::
     }
 
 
-``Socket.close(path, [code], [reason])``
+``Socket.shutdown(path, [code], [reason])``
 ````````````````````````````
 
 Drops all connected sockets on specified `path`, with optional ``code`` (see
-above for available codes) and ``reason``.
+above for available codes) and ``reason``. A ``Socket.REASON_GOING_AWAY`` is
+sent when no code is specified.
 
 Example::
 
     function onmessage(event) {
         if (event.data === "close-broadcast-channel") {
-            Socket.close("/broadcast-channel", Socket.REASON_GOING_AWAY,
-                         "end-of-transmission");
+            Socket.shutdown("/broadcast-channel", Socket.REASON_GOING_AWAY,
+                            "end-of-transmission");
         }
     }
 
