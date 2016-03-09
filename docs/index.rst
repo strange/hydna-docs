@@ -31,7 +31,7 @@ Connect with WebSocket::
     var ws = new WebSocket("ws://127.0.0.1:8070/test/");
 
     ws.onmessage = function(event) {
-        console.log(event);
+        Console.log(event);
     };
 
 Triggers the following handlers:
@@ -49,7 +49,7 @@ Connect with EventSource::
     var es = new EventSource("http://127.0.0.1:8070/test/");
 
     es.onmessage = function(event) {
-        console.log(event);
+        Console.log(event);
     };
 
 Triggers the following handlers:
@@ -168,7 +168,7 @@ Attribute       Description
 Example (current syntax)::
 
     function onclose(event) {
-        console.log(event);
+        Console.log(event);
     }
 
 
@@ -332,6 +332,59 @@ Example::
     Client.send(event.ref, "Welcome!");
 
 
+``Console``
+~~~~~~~~~~~
+
+An api to interact with an extern Console. All functions bellow can also be
+called from the module alias ``console``.
+
+``Console.log(obj, [, obj2, ..., objN])``
+``Console.log(msg, [, subst1, ..., substN])``
+````````````````````````````
+
+Outputs a message in the remote Console.
+
+Example::
+
+    function onopen(event) {
+        Console.log("A new connection connected!");
+    }
+
+
+``Console.info(obj, [, obj2, ..., objN])``
+``Console.info(msg, [, subst1, ..., substN])``
+````````````````````````````
+
+Outputs an informational message in the remote Console. In Hydna Control Panel,
+a small "i" icon is displayed next to these items in the Domain Console's log.
+
+Example::
+
+    function onevent(event) {
+        if (event.identifier === "system-check") {
+            Console.info("Service is runnning as expected");
+        }
+    }
+
+
+``Console.error(obj, [, obj2, ..., objN])``
+``Console.error(msg, [, subst1, ..., substN])``
+````````````````````````````
+
+Outputs an error message in the remote Console.
+
+Example::
+
+    function onmessage(event) {
+        try {
+            let json = JSON.parse(event.data);
+        } catch (jsonDecodeError) {
+            Console.error("An error occured while trying to decode message");
+        }
+    }
+
+
+
 ``Http``
 ~~~~~~~~
 
@@ -349,9 +402,9 @@ Example::
         headers: { 'Content-Type': 'application/json' },
         payload: {test: 'fest'}
     }).then(function(resp) {
-        console.log(resp);
+        Console.log(resp);
     }).catch(function(error) {
-        console.log(error);
+        Console.log(error);
     });
 
 
@@ -365,9 +418,9 @@ Example::
     Http.post('http://httpbin.org/post', {
         payload : 'hello'
     }).then(function(data) {
-        console.log(data);
+        Console.log(data);
     }).catch(function(error) {
-        console.log(error);
+        Console.log(error);
     });
 
 
@@ -381,9 +434,9 @@ Example::
     Http.put('http://httpbin.org/put', {
         payload : 'hello'
     }).then(function(data) {
-        console.log(data);
+        Console.log(data);
     }).catch(function(error) {
-        console.log(error);
+        Console.log(error);
     });
 
 
@@ -397,7 +450,7 @@ Example::
     Http.delete('http://httpbin.org/delete', {
         payload : 'hello'
     }).then(function(data) {
-        console.log(data);
+        Console.log(data);
     }).catch(function(error) {
-        console.log(error);
+        Console.log(error);
     });
