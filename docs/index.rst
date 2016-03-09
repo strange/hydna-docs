@@ -141,12 +141,12 @@ Attributes              Description
                         protocol. Method ``accept`` only allows one protocol.
                         An error will be throwed if ``protocol`` was not
                         requsted by connection (function)
-``deny()``              Deny the request to open the path (function)
+``reject()``            Reject the request to open the path (function)
 ======================= ====================================================
 
 Paths that do not link to a behavior that defines a `onopen`-handler will
 automatically accept connections. Paths that do define the handler will
-**deny** all requests unless exclicitly allowed with a call to
+**reject** all requests unless exclicitly allowed with a call to
 ``event.accept()``.
 
 Example (current syntax)::
@@ -180,7 +180,7 @@ Example (accept with a sub-protocol)::
             event.accept("monitor");
         } else {
             // Did not match any of our sub-protocols
-            event.deny();
+            event.reject();
         }
     }
 
