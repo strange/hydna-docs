@@ -198,12 +198,12 @@ Attribute       Description
 Paths that do not link to a behavior that defines a `ondata`-handler will
 automatically relay the data to all connected clients. Data sent to paths that
 do define the handler will not be sent unless it is explicitly sent with
-either `event.relay()` or `Channel.send(path, msg)`.
+either `event.relay()` or `Socket.send(path, msg)`.
 
 Example (current syntax)::
 
     function ondata(event) {
-        Channel.send(event.path, event.data);
+        Socket.send(event.path, event.data);
     }
 
 Or the same effect but more efficient::
@@ -290,7 +290,7 @@ Example handler::
         http.get(url).then(function(resp) {
             const quote = JSON.parse(resp.body);
             const msg = `[quote] "${quote.quote}" by ${quote.author}\n`;
-            Channel.send(event.path, msg);
+            Socket.send(event.path, msg);
         });
     }
 
@@ -298,38 +298,93 @@ Example handler::
 API
 ---
 
-``Channel``
+``Socket``
 ~~~~~~~~~~~
 
-An api to interact with Hydna channels. All functions in this module return a
+An api to interact with connected sockets. All functions in this module return a
 ``Promise``-instance.
 
-``Channel.send(path, data)``
+Available drop-codes:
+
+============================== ================================================
+Attribute                      Description
+============================== ================================================
+``REASON_NORMAL``              Indicates that this was a normal drop.
+``REASON_GOING_AWAY``          Indicates that server is going away.
+``REASON_PROTOCOL_ERROR``      Indicates that client did not follow protocol.
+``REASON_UNPROCESSABLE_INPUT`` Indicates that client sent bad input.
+===============================================================================
+
+
+``Socket.broadcast(path, data)``
 ````````````````````````````
 
-Send data to a channel.
+Send a `message` to all connected sockets on specified `path`.
 
 Example::
 
-    Channel.send('/world', 'Hello!');
+    Socket.broadcast('/world', 'Hello!');
 
 
-``Client``
-~~~~~~~~~~
-
-Rename to "Connection"?
-
-An api to interact with clients/connections. All functions in this module
-return a ``Promise``-instance.
-
-``Client.send(ref, message)``
-`````````````````````````````
+``Socket.send(ref, data)``
+````````````````````````````
 
 Send a `message` to a specific client identified by `ref`.
 
 Example::
 
-    Client.send(event.ref, "Welcome!");
+    function onmessage(event) {
+        if (event.data === "ping") {
+            Socket.send(event.ref, "pong");
+        }
+    }
+
+
+``Socket.sendAfter(ref, timeout, data)``
+````````````````````````````
+
+Send a `message` after `timeout` to client identified by `ref`.
+
+Example::
+
+    function onopen(event) {
+        Socket.sendAfter(event.ref, 1, "welcome");
+        event.allow();
+    }
+
+
+``Socket.shutdown(path, [code], [reason])``
+````````````````````````````
+
+Drops all connected sockets on specified `path`, with optional ``code`` (see
+above for available codes) and ``reason``. A ``Socket.REASON_GOING_AWAY`` is
+sent when no code is specified.
+
+Example::
+
+    function onmessage(event) {
+        if (event.data === "close-broadcast-channel") {
+            Socket.shutdown("/broadcast-channel", Socket.REASON_GOING_AWAY,
+                            "end-of-transmission");
+        }
+    }
+
+
+``Socket.drop(ref, [code], [reason])``
+````````````````````````````
+
+Drops the socket identified by `ref` with optional ``code`` (see above for
+available codes) and ``reason``. A ``Socket.REASON_NORMAL`` is sent when
+no code is specified.
+
+Example::
+
+    function onmessage(event) {
+        if (event.data === "kill-me") {
+            Socket.drop(event.ref, Socket.REASON_NORMAL, "You asked for it!");
+        }
+    }
+
 
 
 ``Http``
