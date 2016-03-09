@@ -304,6 +304,18 @@ API
 An api to interact with connected sockets. All functions in this module return a
 ``Promise``-instance.
 
+Available drop-codes:
+
+============================== ================================================
+Attribute                      Description
+============================== ================================================
+``REASON_NORMAL``              Indicates that this was a normal drop.
+``REASON_GOING_AWAY``          Indicates that server is going away.
+``REASON_PROTOCOL_ERROR``      Indicates that client did not follow protocol.
+``REASON_UNPROCESSABLE_INPUT`` Indicates that client sent bad input.
+===============================================================================
+
+
 ``Socket.broadcast(path, data)``
 ````````````````````````````
 
@@ -341,30 +353,34 @@ Example::
     }
 
 
-``Socket.close(path, [reason])``
+``Socket.close(path, [code], [reason])``
 ````````````````````````````
 
-Drops all connected sockets on specified `path`, with optional `reason`.
+Drops all connected sockets on specified `path`, with optional ``code`` (see
+above for available codes) and ``reason``.
 
 Example::
 
     function onmessage(event) {
         if (event.data === "close-broadcast-channel") {
-            Socket.close("/broadcast-channel", "end-of-transmission");
+            Socket.close("/broadcast-channel", Socket.REASON_GOING_AWAY,
+                         "end-of-transmission");
         }
     }
 
 
-``Socket.drop(ref, [reason])``
+``Socket.drop(ref, [code], [reason])``
 ````````````````````````````
 
-Drops the socket identified by `ref` with optional `reason`.
+Drops the socket identified by `ref` with optional ``code`` (see above for
+available codes) and ``reason``. A ``Socket.REASON_NORMAL`` is sent when
+no code is specified.
 
 Example::
 
     function onmessage(event) {
         if (event.data === "kill-me") {
-            Socket.drop(event.ref, "You asked for it!");
+            Socket.drop(event.ref, Socket.REASON_NORMAL, "You asked for it!");
         }
     }
 
