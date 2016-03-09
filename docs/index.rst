@@ -304,6 +304,7 @@ API
 An api to interact with Hydna channels. All functions in this module return a
 ``Promise``-instance.
 
+
 ``Channel.send(path, data)``
 ````````````````````````````
 
@@ -338,66 +339,146 @@ Example::
 An api to make HTTP requests. All functions in this module return a
 ``Promise``-instance.
 
+All functions in the ``Http``-module takes an optional options object containing
+any custom settings that you want to apply to the request. The possible options
+are:
+
+=================== ============================================================
+Attribute           Description
+=================== ============================================================
+``method``          The request method, e.g., ``GET``, ``POST``. ``GET`` is
+                    the default request method (string)
+``headers``         Any headers you want to add to your request (object)
+``body``            Any body that you want to add to your request: this can be a
+                    ``ArrayBuffer``, or ``String`` object. Note that a request
+                    using the ``GET`` or ``HEAD`` method cannot have a body.
+``followRedirects`` Indicates if redirects should be followed or not (bool)
+=================== ============================================================
+
+.. note:: The maximum redirect hops is set by system and cannot be overriden.
+          You can get the maximum redirect hops for your system by calling
+          ``Domain.env("http.limit.redirect-hops")``.
+
+.. note:: A request timeouts if it takes too long process. You can get your
+          system timeout by calling ``Domain.env("http.limit.timeout")``. The
+          value is in milliseconds.
+
+Each HTTP-Request is followed by a HTTP-Response. The HTTP-Response has the
+following attributes:
+
+=================== ============================================================
+Attribute           Description
+=================== ============================================================
+``url``             The URL of the response (string)
+``headers``         All headers associated with the response. (object)
+``status``          The status code of the response (e.g., 200 for a
+                    success) (number)
+``statusText``      Contains the status message corresponding to the status
+                    code (e.g., OK for 200). (string)
+``text()``          Takes a Response and reads it to completion. It returns a
+                    ``Promise`` that resolves with a ``String`` (Promise)
+``json()``          Takes a Response and reads it to completion. It returns a
+                    ``Promise`` that resolves with a ``String`` (Promise)
+``formData()``      Takes a Response and reads it to completion. It returns a
+                    ``Promise`` that resolves with a ``Object`` (Promise)
+``arrayBuffer()``   Takes a Response and reads it to completion. It returns a
+                    ``Promise`` that resolves with a ``ArrayBuffer`` (Promise)
+=================== ============================================================
+
+
+``Http.request(url, [options])``
+````````````````````````````
+
+Make a HTTP request to ``url`` with optional ``options``.
+
+Example (Get a resource as text)::
+
+    Http.request("http://httpbin.org/get")
+        .then((response) => response.text())
+        .then((text) => console.log(`Response ${text}`))
+        .catch((error) => console.log(`Network error while fetching, ${error}`);
+
+
+Example (Get a resource as JSON)::
+
+    Http.request("http://httpbin.org/get")
+        .then((response) => response.json())
+        .then((data) => console.log(data))
+        .catch((error) => console.log(`Network error while fetching, ${error}`);
+
+
+Example (Post data to a resource)::
+
+    const options = {
+        method: "POST",
+        headers: { "Content-Type": "application/json"},
+        body: JSON.stringify({ payload: "data" }),
+    };
+
+    Http.request("http://httpbin.org/post", options)
+        .then((response) => {
+            if (response.status === 200) {
+                Console.log("Successfully posted data to resource");
+            } else {
+                Console.log("Failed to post resource");
+            }
+        })
+        .catch((error) => console.log(`Network error while posting, ${error}`));
+
+
 ``Http.get(url, [options])``
 ````````````````````````````
 
-Make a HTTP GET request to ``url``.
+Make a HTTP GET request to ``url``. This is an alias for
+``Http.request(url, { method: "GET" })``.
 
 Example::
 
-    Http.get('http://httpbin.org/get?test=fest', {
-        headers: { 'Content-Type': 'application/json' },
-        payload: {test: 'fest'}
-    }).then(function(resp) {
-        console.log(resp);
-    }).catch(function(error) {
-        console.log(error);
-    });
+    Http.get('http://httpbin.org/get?test=fest')
+        .then((r) => console.log(`Status: ${r.status}`));
 
 
 ``Http.post(url, [options])``
 `````````````````````````````
 
-Make a HTTP POST request to ``url``.
+Make a HTTP POST request to ``url``. This is an alias for
+``Http.request(url, { method: "POST" })``.
 
 Example::
 
-    Http.post('http://httpbin.org/post', {
-        payload : 'hello'
-    }).then(function(data) {
-        console.log(data);
-    }).catch(function(error) {
-        console.log(error);
-    });
+    const options = {
+        headers: { "Content-Type", "text/plain" },
+        body: "payload",
+    };
+
+    Http.post('http://httpbin.org/post', options)
+        .then((r) => console.log(`Status: ${r.status}`));
 
 
 ``Http.put(url, [options])``
 ````````````````````````````
 
-Make a HTTP PUT request to ``url``.
+Make a HTTP PUT request to ``url``. This is an alias for
+``Http.request(url, { method: "PUT" })``.
 
 Example::
 
-    Http.put('http://httpbin.org/put', {
-        payload : 'hello'
-    }).then(function(data) {
-        console.log(data);
-    }).catch(function(error) {
-        console.log(error);
-    });
+    const options = {
+        headers: { "Content-Type", "text/plain" },
+        body: "payload",
+    };
+
+    Http.put('http://httpbin.org/put', options)
+        .then((r) => console.log(`Status: ${r.status}`));
 
 
 ``Http.delete(url, [options])``
 ```````````````````````````````
 
-Make a HTTP DELETE request to ``url``.
+Make a HTTP DELETE request to ``url``. This is an alias for
+``Http.request(url, { method: "DELETE" })``.
 
 Example::
 
-    Http.delete('http://httpbin.org/delete', {
-        payload : 'hello'
-    }).then(function(data) {
-        console.log(data);
-    }).catch(function(error) {
-        console.log(error);
-    });
+    Http.post('http://httpbin.org/put', options)
+        .then((r) => console.log(`Status: ${r.status}`));
