@@ -121,21 +121,25 @@ Event handlers
 Triggered when a client attempts to connect to a path. The event object
 contains the following:
 
-=============== =============================================================
-Attribute       Description
-=============== =============================================================
-``domain``      Name of the current domain (string)
-``ref``         Unique reference of the connected client (string)
-``ip``          IP address of the connected client (string)
-``bindings``    Any **bindings** extracted from the path (object)
-``path``        The current path (string)
-``querystring`` The raw querystring (string)
-``transport``   Name of the transport (``http`` or ``ws``) (string)
-``secure``      Booleand dictating whether the connection is encrypted
-                (boolean)
-``allow()``     Allow the client to open the path (function)
-``deny()``      Deny the request to open the path (function)
-=============== =============================================================
+==================== ===========================================================
+Attribute            Description
+==================== ===========================================================
+``domain``           Name of the current domain (string)
+``ref``              Unique reference of the connected client (string)
+``ip``               IP address of the connected client (string)
+``bindings``         Any **bindings** extracted from the path (object)
+``path``             The current path (string)
+``querystring``      The raw querystring (string)
+``transport``        Name of the transport (``http`` or ``ws``) (string)
+``secure``           Booleand dictating whether the connection is encrypted
+                     (boolean)
+``state()``          Return state of current ref, or ``null`` if not set.
+``setState(state)``  Set state for current ref. The state object is serialized
+                     using JSON. Throws if the serialized context overrides
+                     4kb in size.
+``allow()``          Allow the client to open the path (function)
+``deny()``           Deny the request to open the path (function)
+==================== ===========================================================
 
 Paths that do not link to a behavior that defines a `onopen`-handler will
 automatically allow connections. Paths that do define the handler will
@@ -148,6 +152,23 @@ Example (current syntax)::
         event.allow();
     }
 
+Example (connection state)::
+
+    function onopen(event) {
+        assert(event.state() === null);
+        if (event.querystring === ADMIN_PASSWORD) {
+            event.setState({ admin: true });
+        }
+        event.allow();
+    }
+
+    function onclose(event) {
+        const state = event.state();
+        if (state !== null && state.admin === true) {
+            Channel.send(event.path, "An admin has leaved the channel");
+        }
+    }
+
 
 ``onclose(event)``
 ~~~~~~~~~~~~~~~~~~
@@ -155,15 +176,18 @@ Example (current syntax)::
 Triggered when a client closes a path or is disconnected. The event object
 contains the following:
 
-=============== =============================================================
-Attribute       Description
-=============== =============================================================
-``domain``      Name of the current domain (string)
-``ref``         Unique reference of the connected client (string)
-``bindings``    Any **bindings** extracted from the path (object)
-``path``        The current path (string)
-``reason``      An optional reason for the event (string)
-=============== =============================================================
+==================== ===========================================================
+Attribute            Description
+==================== ===========================================================
+``domain``           Name of the current domain (string)
+``ref``              Unique reference of the connected client (string)
+``path``             The current path (string)
+``reason``           An optional reason for the event (string)
+``state()``          Return state of current ref, or ``null`` if not set.
+``setState(state)``  Set state for current ref. The state object is serialized
+                     using JSON. Throws if the serialized context overrides
+                     4kb in size.
+==================== ===========================================================
 
 Example (current syntax)::
 
@@ -178,22 +202,20 @@ Example (current syntax)::
 Triggered when a client sends data to a path. The event object contains the
 following:
 
-=============== =============================================================
-Attribute       Description
-=============== =============================================================
-``domain``      Name of the current domain (string)
-``ref``         Unique reference of the connected client (string)
-``ip``          IP address of the connected client (string)
-``bindings``    Any **bindings** extracted from the path (object)
-``path``        The current path (string)
-``querystring`` The raw querystring (string)
-``transport``   Name of the transport (``http`` or ``ws``) (string)
-``secure``      Booleand dictating whether the connection is encrypted
-                (boolean)
-``data``        The data sent (string)
-``relay()``     Automaically relay the data to all clients connected to
-                the path (function)
-=============== =============================================================
+==================== ===========================================================
+Attribute            Description
+==================== ===========================================================
+``domain``           Name of the current domain (string)
+``ref``              Unique reference of the connected client (string)
+``path``             The current path (string)
+``data``             The data sent (string)
+``state()``          Return state of current ref, or ``null`` if not set.
+``setState(state)``  Set state for current ref. The state object is serialized
+                     using JSON. Throws if the serialized context overrides
+                     4kb in size.
+``relay()``          Automaically relay the data to all clients connected to
+                     the path (function)
+==================== ===========================================================
 
 Paths that do not link to a behavior that defines a `ondata`-handler will
 automatically relay the data to all connected clients. Data sent to paths that
