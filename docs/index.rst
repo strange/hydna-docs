@@ -70,7 +70,7 @@ Example (current syntax)::
         "channels": [
             {
                 "path": "/chat",
-                "source": "function onopen(event) { event.allow(); }"
+                "source": "function onopen(event) { event.accept(); }"
             },
             {
                 "path": "/ticker",
@@ -92,7 +92,7 @@ Example (proposed new syntax)::
         "handlers": [
             {
                 "path": "/chat",
-                "source": "function onopen(event) { event.allow(); }"
+                "source": "function onopen(event) { event.accept(); }"
             },
             {
                 "path": "/ticker",
@@ -137,22 +137,22 @@ Attributes              Description
 ``secure``              Booleand dictating whether the connection is encrypted
                         (boolean)
 ``setCookie(value)``    Set the cookie of the **upgrade** response (function)
-``allow([protocol])``   Accept connection to open the path with optional sub
-                        protocol. Method ``allow`` only allows one protocol.
+``accept([protocol])``  Accept connection to open the path with optional sub
+                        protocol. Method ``accept`` only allows one protocol.
                         An error will be throwed if ``protocol`` was not
                         requsted by connection (function)
 ``deny()``              Deny the request to open the path (function)
 ======================= ====================================================
 
 Paths that do not link to a behavior that defines a `onopen`-handler will
-automatically allow connections. Paths that do define the handler will
+automatically accept connections. Paths that do define the handler will
 **deny** all requests unless exclicitly allowed with a call to
-``event.allow()``.
+``event.accept()``.
 
 Example (current syntax)::
 
     function onopen(event) {
-        event.allow();
+        event.accept();
     }
 
 Example (Get and set cookie)::
@@ -164,20 +164,20 @@ Example (Get and set cookie)::
         }
         const now = Date.now();
         event.setCookie("last-visit=" + now);
-        event.allow();
+        event.accept();
     }
 
 
-Example (allow with a sub-protocol)::
+Example (accept with a sub-protocol)::
 
     function onopen(event) {
         if (event.subprotocols.includes("admin") &&
             event.querystring === Domain.env("admin-password")) {
             // Accept an admin connection if password is matching.
-            event.allow("admin");
+            event.accept("admin");
         } else if (event.subprotocols.includes("monitor")) {
             // Accept a monitor connection, no password needed.
-            event.allow("monitor");
+            event.accept("monitor");
         } else {
             // Did not match any of our sub-protocols
             event.deny();
