@@ -121,21 +121,28 @@ Event handlers
 Triggered when a client attempts to connect to a path. The event object
 contains the following:
 
-=============== =============================================================
-Attribute       Description
-=============== =============================================================
-``domain``      Name of the current domain (string)
-``ref``         Unique reference of the connected client (string)
-``ip``          IP address of the connected client (string)
-``bindings``    Any **bindings** extracted from the path (object)
-``path``        The current path (string)
-``querystring`` The raw querystring (string)
-``transport``   Name of the transport (``http`` or ``ws``) (string)
-``secure``      Booleand dictating whether the connection is encrypted
-                (boolean)
-``allow()``     Allow the client to open the path (function)
-``deny()``      Deny the request to open the path (function)
-=============== =============================================================
+======================= ====================================================
+Attributes              Description
+======================= ====================================================
+``domain``              Name of the current domain (string)
+``ref``                 Unique reference of the connected client (string)
+``ip``                  IP address of the connected client (string)
+``headers``             An ``Object`` containing all headers in the **upgrade**
+                        request (object)
+``subprotocols``        A list containing requested sub-protocols (Array)
+``bindings``            Any **bindings** extracted from the path (object)
+``path``                The current path (string)
+``querystring``         The raw querystring (string)
+``transport``           Name of the transport (``http`` or ``ws``) (string)
+``secure``              Booleand dictating whether the connection is encrypted
+                        (boolean)
+``setCookie(value)``    Set the cookie of the **upgrade** response (function)
+``allow([protocol])``   Accept connection to open the path with optional sub
+                        protocol. Method ``allow`` only allows one protocol.
+                        An error will be throwed if ``protocol`` was not
+                        requsted by connection (function)
+``deny()``              Deny the request to open the path (function)
+======================= ====================================================
 
 Paths that do not link to a behavior that defines a `onopen`-handler will
 automatically allow connections. Paths that do define the handler will
@@ -146,6 +153,43 @@ Example (current syntax)::
 
     function onopen(event) {
         event.allow();
+    }
+
+Example (Get and set cookie)::
+
+    function onopen(event) {
+        if (event.headers.cookie.startsWith("last-visit=")) {
+            const lastVisit = event.headers.cookie.substr(11);
+            console.log(`Last visit ${last-visit}`);
+        }
+        const now = Date.now();
+        event.setCookie("last-visit=" + now);
+        event.allow();
+    }
+
+
+Example (allow with a sub-protocol)::
+
+    function onopen(event) {
+        if (event.subprotocols.includes("admin") &&
+            event.querystring === Domain.env("admin-password")) {
+            // Accept an admin connection if password is matching.
+            event.allow("admin");
+        } else if (event.subprotocols.includes("monitor")) {
+            // Accept a monitor connection, no password needed.
+            event.allow("monitor");
+        } else {
+            // Did not match any of our sub-protocols
+            event.deny();
+        }
+    }
+
+    function onmessage(event) {
+        if (event.subprotocol === "admin") {
+            // Do stuff with an admin connection
+        } else if (event.subprotocol === "monitor") {
+            // Do stuff with a monitor connection
+        }
     }
 
 
@@ -162,6 +206,8 @@ Attribute       Description
 ``ref``         Unique reference of the connected client (string)
 ``bindings``    Any **bindings** extracted from the path (object)
 ``path``        The current path (string)
+``subprotocol`` The accepted subprotocol of connection, or empty string
+                if not set when connection was accepted (string)
 ``reason``      An optional reason for the event (string)
 =============== =============================================================
 
@@ -190,6 +236,8 @@ Attribute       Description
 ``transport``   Name of the transport (``http`` or ``ws``) (string)
 ``secure``      Booleand dictating whether the connection is encrypted
                 (boolean)
+``subprotocol`` The accepted subprotocol of connection, or empty string
+                if not set when connection was accepted (string)
 ``data``        The data sent (string)
 ``relay()``     Automaically relay the data to all clients connected to
                 the path (function)
