@@ -134,7 +134,6 @@ contains the following:
 =============== =============================================================
 Attribute       Description
 =============== =============================================================
-``domain``      Name of the current domain (string)
 ``ref``         Unique reference of the connected client (string)
 ``ip``          IP address of the connected client (string)
 ``bindings``    Any **bindings** extracted from the path (object)
