@@ -404,7 +404,7 @@ Example::
 
 
 ``Cache``
-~~~~~~~~
+~~~~~~~~~
 
 An api to interact with domains key/value cache. All functions in this
 module return a ``Promise``-instance.
@@ -434,7 +434,7 @@ Example::
 
 
 ``Cache.del(key)``
-`````````````````````````
+``````````````````
 
 Permanently delete ``key``
 
@@ -445,7 +445,7 @@ Example::
 
 
 ``Cache.incr(key, [max])``
-`````````````````````````
+``````````````````````````
 
 Increase value associated with ``key`` bye one. The initial value is set to
 ``0`` if the key does not exist.
@@ -461,7 +461,7 @@ Example::
 
 
 ``Cache.decr(key, [min])``
-`````````````````````````
+``````````````````````````
 
 Works like ``incr()`` above, but decreases the value of ``key`` by one.
 
@@ -473,7 +473,7 @@ Example::
 
 
 ``Cache.push(key, value)``
-`````````````````````````
+``````````````````````````
 
 Adds ``value`` to the end of list ``key``.
 
@@ -489,7 +489,7 @@ Example::
 
 
 ``Cache.pop(key)``
-`````````````````````````
+``````````````````
 
 Pop a value from the back of ``key``. Returns ``undefined`` if list is empty.
 
@@ -507,7 +507,7 @@ Example::
 
 
 ``Cache.unshift(key, value)``
-`````````````````````````
+`````````````````````````````
 
 Adds ``value`` to the begining of list ``key``.
 
@@ -521,7 +521,7 @@ Pop a value from the front ``key``. Returns ``undefined`` if list is empty.
 
 
 ``Cache.range(key, start, [length])``
-`````````````````````````
+`````````````````````````````````````
 
 Return a range of elements in list at ``key`` starting at ``start`` (inclusive,
 zero-based). If start is a negative number the range will start that many
@@ -538,7 +538,7 @@ range from the list).
 
 
 ``Cache.hget(key, field)``
-```````````````````````````
+``````````````````````````
 
 Gets value from ``field`` of hash ``key``.
 
@@ -562,7 +562,7 @@ Example::
 
 
 ``Cache.hkeys(key)``
-```````````````````````````
+````````````````````
 
 Returns a list of all available fields of hash ``key``.
 
@@ -577,13 +577,13 @@ Example::
 
 
 ``Cache.hvalues(key)``
-```````````````````````````````
+``````````````````````
 
 Returns a list of all available values which fields of hash ``key``.
 
 
 ``Cache.hdel(key, field)``
-```````````````````````````````
+``````````````````````````
 
 Delete``field`` of hash ``key``.
 
