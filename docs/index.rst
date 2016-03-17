@@ -401,3 +401,200 @@ Example::
     }).catch(function(error) {
         console.log(error);
     });
+
+
+``Cache``
+~~~~~~~~~
+
+An API to interact with a domain's key-value cache. All functions in this
+module return a ``Promise``-instance.
+
+
+``Cache.get(key)``
+``````````````````
+
+Get value associated with ``key``. Will return an error if the value is 
+a hash, a list, or if there is no value associated with the key.
+
+Example::
+
+    function onopen(event) {
+        Cache.get("welcome-message")
+            .then((value) => Channel.sendAfter(event.ref, 1, value));
+    }
+
+
+``Cache.set(key, value)``
+`````````````````````````
+
+Destructively set value of ``key`` to ``value``. Any existing value --
+regardless of type -- will be overwritten.
+
+Example::
+
+    Cache.set("secret-key", "password")
+        .then(() => Console.log("Set was successfull"))
+        .catch((error) => Console.log("An error occured %s", error.message));
+
+
+``Cache.del(key)``
+``````````````````
+
+Permanently delete value at ``key``, regardless of type.
+
+Example::
+
+    Cache.del("key").then(() => Console.log("Key is now deleted"));
+
+
+``Cache.incr(key, [max])``
+``````````````````````````
+
+Increase value associated with ``key`` by ``1``. The initial value is set to
+``0`` if the key does not exist. Will return an error if there is an existing
+value at ``key`` that cannot be converted into an integer. A successfull
+invocation will return the new value.
+
+Example::
+
+    const MAX_CONNECTIONS = 10;
+    function onopen(event) {
+        Cache.incr("path-counter", MAX_CONNECTIONS)
+            .then(() => event.allow())
+            .catch(() => event.deny())
+    }
+
+
+``Cache.decr(key, [min])``
+``````````````````````````
+
+Works like ``incr()`` above, but decreases the value of ``key`` by ``1``.
+
+Example::
+
+    function onclose(event) {
+        Cache.decr("path-counter");
+    }
+
+
+``Cache.push(key, value)``
+``````````````````````````
+
+Adds ``value`` to the end of list at ``key``. Will return an error if the key
+exists and the value is not a list. A successfull invocation returns the
+current length of the list.
+
+Example::
+
+    function onmessage(event) {
+        if (event.data.startsWith("add-job")) {
+            const jobname = event.data.substr(6);
+            Cache.push("work-queue", jobname);
+        }
+    }
+
+
+
+``Cache.pop(key)``
+``````````````````
+
+Pop a value from the end of list at ``key``. If the popped item was the last
+item, the key is deleted. An error will be returned if  an attempt is made to
+pop an item from a value that is not a list.
+
+Example::
+
+    function onevent(event) {
+        if (event.handler === "workqueue-tick") {
+            Cache.pop("work-queue").then((value) => {
+                // Do something with job
+            });
+        }
+    }
+
+
+``Cache.unshift(key, value)``
+`````````````````````````````
+
+Add ``value`` to the begining of list at ``key``.
+
+
+
+``Cache.shift(key)``
+````````````````````
+
+Remove and return a value from the beginning of list at ``key``. If the item
+was the last item, the key is deleted. An error will be returned if  an
+attempt is made to pop an item from a value that is not a list.
+
+
+``Cache.range(key, start, [length])`` (TBA)
+```````````````````````````````````````````
+
+Return a range of elements in list at ``key`` starting at ``start`` (inclusive,
+zero-based). If start is a negative number the range will start that many
+elements from the end of the list.
+
+
+``Cache.trim(key, start, [length])`` (TBA)
+``````````````````````````````````````````
+
+Works basically the same as range() (see above), but trims the list to contain
+only elements in the specified range (i.e. it removes all elements not in the
+range from the list).
+
+
+``Cache.hget(key, field)``
+``````````````````````````
+
+Get value from ``field`` of hash ``key``.
+
+
+``Cache.hset(key, field, value)``
+`````````````````````````````````
+
+Set ``field`` of hash ``key`` to ``value``. Will return ``true`` if the
+``field`` was not present in the hash prior to the invocation.
+
+
+Example::
+
+    function onopen(event) {
+        const username = event.querystring;
+        Cache.hset("connected-users", event.ref, username)
+            .then(() => event.allow())
+            .catch(() => event.deny());
+    }
+
+
+``Cache.hkeys(key)``
+````````````````````
+
+Return a list of all fields in hash associated with ``key``.
+
+Example::
+
+    function onmessage(event) {
+        if (event.data === "list-users") {
+            Cache.hkeys("connected-users")
+                .then((keys) => Socket.send(event.ref, JSON.stringify(keys)));
+        }
+    }
+
+
+``Cache.hvalues(key)``
+``````````````````````
+
+Return a list of all values in hash associated with ``key``.
+
+
+``Cache.hdel(key, field)``
+``````````````````````````
+
+Delete ``field`` in hash associated with ``key``.
+
+Example::
+
+    function onclose(event) {
+        Cache.hdel("connected-users", event.ref);
+    }
