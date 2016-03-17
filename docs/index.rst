@@ -406,25 +406,29 @@ Example::
 ``Cache``
 ~~~~~~~~~
 
-An api to interact with domains key/value cache. All functions in this
+An API to interact with a domain's key-value cache. All functions in this
 module return a ``Promise``-instance.
+
 
 ``Cache.get(key)``
 ``````````````````
 
-Gets value of ``key``.
+Get value associated with ``key``. Will return an error if the value is 
+a hash, a list, or if there is no value associated with the key.
 
 Example::
 
     function onopen(event) {
-        Cache.get("welcome-message").then((value) => Channel.sendAfter(event.ref, 1, value));
+        Cache.get("welcome-message")
+            .then((value) => Channel.sendAfter(event.ref, 1, value));
     }
 
 
 ``Cache.set(key, value)``
 `````````````````````````
 
-Set ``key`` to ``value``.
+Destructively set value of ``key`` to ``value``. Any existing value --
+regardless of type -- will be overwritten.
 
 Example::
 
@@ -436,19 +440,20 @@ Example::
 ``Cache.del(key)``
 ``````````````````
 
-Permanently delete ``key``
+Permanently delete value at ``key``, regardless of type.
 
 Example::
 
     Cache.del("key").then(() => Console.log("Key is now deleted"));
 
 
-
 ``Cache.incr(key, [max])``
 ``````````````````````````
 
-Increase value associated with ``key`` bye one. The initial value is set to
-``0`` if the key does not exist.
+Increase value associated with ``key`` by ``1``. The initial value is set to
+``0`` if the key does not exist. Will return an error if there is an existing
+value at ``key`` that cannot be converted into an integer. A successfull
+invocation will return the new value.
 
 Example::
 
@@ -463,7 +468,7 @@ Example::
 ``Cache.decr(key, [min])``
 ``````````````````````````
 
-Works like ``incr()`` above, but decreases the value of ``key`` by one.
+Works like ``incr()`` above, but decreases the value of ``key`` by ``1``.
 
 Example::
 
@@ -475,7 +480,9 @@ Example::
 ``Cache.push(key, value)``
 ``````````````````````````
 
-Adds ``value`` to the end of list ``key``.
+Adds ``value`` to the end of list at ``key``. Will return an error if the key
+exists and the value is not a list. A successfull invocation returns the
+current length of the list.
 
 Example::
 
@@ -491,16 +498,16 @@ Example::
 ``Cache.pop(key)``
 ``````````````````
 
-Pop a value from the back of ``key``. Returns ``undefined`` if list is empty.
+Pop a value from the end of list at ``key``. If the popped item was the last
+item, the key is deleted. An error will be returned if  an attempt is made to
+pop an item from a value that is not a list.
 
 Example::
 
     function onevent(event) {
         if (event.handler === "workqueue-tick") {
             Cache.pop("work-queue").then((value) => {
-                if (value !== void(0)) {
-                    // Do something with job
-                }
+                // Do something with job
             });
         }
     }
@@ -509,45 +516,45 @@ Example::
 ``Cache.unshift(key, value)``
 `````````````````````````````
 
-Adds ``value`` to the begining of list ``key``.
+Add ``value`` to the begining of list at ``key``.
 
 
 
 ``Cache.shift(key)``
 ````````````````````
 
-Pop a value from the front ``key``. Returns ``undefined`` if list is empty.
+Remove and return a value from the beginning of list at ``key``. If the item
+was the last item, the key is deleted. An error will be returned if  an
+attempt is made to pop an item from a value that is not a list.
 
 
-
-``Cache.range(key, start, [length])``
-`````````````````````````````````````
+``Cache.range(key, start, [length])`` (TBA)
+```````````````````````````````````````````
 
 Return a range of elements in list at ``key`` starting at ``start`` (inclusive,
 zero-based). If start is a negative number the range will start that many
 elements from the end of the list.
 
 
-``Cache.trim(key, start, [length])``
-````````````````````````````````````
+``Cache.trim(key, start, [length])`` (TBA)
+``````````````````````````````````````````
 
 Works basically the same as range() (see above), but trims the list to contain
 only elements in the specified range (i.e. it removes all elements not in the
 range from the list).
 
 
-
 ``Cache.hget(key, field)``
 ``````````````````````````
 
-Gets value from ``field`` of hash ``key``.
-
+Get value from ``field`` of hash ``key``.
 
 
 ``Cache.hset(key, field, value)``
 `````````````````````````````````
 
-Set ``field`` of hash ``key`` to ``value``.
+Set ``field`` of hash ``key`` to ``value``. Will return ``true`` if the
+``field`` was not present in the hash prior to the invocation.
 
 
 Example::
@@ -560,11 +567,10 @@ Example::
     }
 
 
-
 ``Cache.hkeys(key)``
 ````````````````````
 
-Returns a list of all available fields of hash ``key``.
+Return a list of all fields in hash associated with ``key``.
 
 Example::
 
@@ -579,17 +585,16 @@ Example::
 ``Cache.hvalues(key)``
 ``````````````````````
 
-Returns a list of all available values which fields of hash ``key``.
+Return a list of all values in hash associated with ``key``.
 
 
 ``Cache.hdel(key, field)``
 ``````````````````````````
 
-Delete``field`` of hash ``key``.
+Delete ``field`` in hash associated with ``key``.
 
 Example::
 
     function onclose(event) {
         Cache.hdel("connected-users", event.ref);
     }
-
