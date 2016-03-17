@@ -37,7 +37,7 @@ Connect with WebSocket::
 Triggers the following handlers:
 
 - ``onopen``
-- ``ondata``
+- ``onmessage``
 - ``onclose``
 
 
@@ -172,7 +172,7 @@ Example (current syntax)::
     }
 
 
-``ondata(event)``
+``onmessage(event)``
 ~~~~~~~~~~~~~~~~~~
 
 Triggered when a client sends data to a path. The event object contains the
@@ -195,20 +195,20 @@ Attribute       Description
                 the path (function)
 =============== =============================================================
 
-Paths that do not link to a behavior that defines a `ondata`-handler will
+Paths that do not link to a behavior that defines a `onmessage`-handler will
 automatically relay the data to all connected clients. Data sent to paths that
 do define the handler will not be sent unless it is explicitly sent with
 either `event.relay()` or `Channel.send(path, msg)`.
 
 Example (current syntax)::
 
-    function ondata(event) {
+    function onmessage(event) {
         Channel.send(event.path, event.data);
     }
 
 Or the same effect but more efficient::
 
-    function ondata(event) {
+    function onmessage(event) {
         event.relay();
     }
 
