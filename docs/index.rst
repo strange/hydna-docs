@@ -265,6 +265,14 @@ Attribute               Description
               headers["set-cookie"] = ["name=john", "town=NY"];
           ``
 
+          The above example would generate the following HTTP-headers in the
+          response:
+          ``
+              Set-Cookie: name=john
+              Set-Cookie: town=NY
+          ``
+
+
 .. note:: Header ``Content-Type`` is automatically set to "text/plain", if not
           specified manually.
 
