@@ -218,26 +218,89 @@ Or the same effect but more efficient::
 
 Triggered when a HTTP request is made.
 
-=============== =============================================================
-Attribute       Description
-=============== =============================================================
-``domain``      Name of the current domain (string)
-``ref``         Unique reference of the connected client (string)
-``ip``          IP address of the connected client (string)
-``bindings``    Any **bindings** extracted from the path (object)
-``path``        The current path (string)
-``querystring`` The raw querystring (string)
-``transport``   Name of the transport (``http`` or ``ws``) (string)
-``secure``      Booleand dictating whether the connection is encrypted
-                (boolean)
-``data``        The data sent (string)
-``resp(body)``  Respond to the request.
-=============== =============================================================
+=================== ============================================================
+Attribute           Description
+=================== ============================================================
+``url``             The URL of the request (without protocol and domain) e.g
+                    "/chat/channel-1?search" (string)
+``headers``         All headers associated with the request. (object)
+``ip``              IP address of the connected client (string)
+``bindings``        Any **bindings** extracted from the path (object)
+``path``            The current path (string)
+``querystring``     The raw querystring (string)
+``secure``          Indicates  whether the connection is encrypted or not
+                    (boolean)
+``text()``          Takes request data and reads it to completion. It returns a
+                    ``Promise`` that resolves with a ``String`` (Promise)
+``json()``          Takes request data and reads it to completion. It returns a
+                    ``Promise`` that resolves with a ``Object`` (Promise)
+``formData()``      Takes request data and reads it to completion. It returns a
+                    ``Promise`` that resolves with a ``Object`` (Promise)
+``arrayBuffer()``   Takes request data and reads it to completion. It returns a
+                    ``Promise`` that resolves with a ``ArrayBuffer`` (Promise)
+``response``        A reference to the Response-object objekt for the Request.
+                    See table below for further info.
+=================== ============================================================
 
-Example::
+Each HTTP request event also comes with a ``response`` object, which is used to
+send back data to the remote connection. The ``response``-attributes:
+
+======================= ========================================================
+Attribute               Description
+======================= ========================================================
+``statusCode``          The response status code. Default is 200 (string)
+``statusMessage``       The response status message (string)
+``headers``             All headers associated with the response. (object)
+``end([body])``         End the response by sending *statusCode*,
+                        *statusMessage*, *headers* and the specified
+                        optional *body*.
+======================= ========================================================
+
+.. note:: Header ``Date`` is automatically set to current time, if not specified
+          manually. This behavior is required by the HTTP standard.
+
+.. note:: You can supply multiple values for an header by wrap a key-value with
+          an array notation:
+          ``
+              headers["set-cookie"] = ["name=john", "town=NY"];
+          ``
+
+.. note:: Header ``Content-Type`` is automatically set to "text/plain", if not
+          specified manually.
+
+.. note:: Header ``Content-Length`` is automatically set if not specified
+          manually.
+
+.. note:: The response timeout is automatically set by the system. Get current
+          timeout by calling ``Domain.env("http.limit.timeout")``. The
+          value is in milliseconds.
+
+.. note:: Calling ``end`` more then once, throws an exception.
+
+Example (simple response)::
 
     function onrequest(req) {
-        req.resp("Hello world");
+        req.response.end("hello world");
+    }
+
+Example (respond with JSON)::
+
+    function onrequest(req) {
+        const response = req.response;
+        const body = JSON.stringify({ id: 1, text: "item text"});
+        response.headers = {
+            "Content-Length": body.length.
+            "Content-Type": "application/json".
+        };
+        response.end(body);
+    }
+
+Example (respond with a 404 Not Found)::
+
+    function onrequest(req) {
+        const response = req.response;
+        response.statusCode = 404;
+        response.end();
     }
 
 
@@ -413,7 +476,7 @@ module return a ``Promise``-instance.
 ``Cache.get(key)``
 ``````````````````
 
-Get value associated with ``key``. Will return an error if the value is 
+Get value associated with ``key``. Will return an error if the value is
 a hash, a list, or if there is no value associated with the key.
 
 Example::
