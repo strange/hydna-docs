@@ -527,6 +527,11 @@ Remove and return a value from the beginning of list at ``key``. If the item
 was the last item, the key is deleted. An error will be returned if  an
 attempt is made to pop an item from a value that is not a list.
 
+``Cache.popunshift(fromKey, toKey)``
+````````````````````
+
+Pop value from ``fromKey`` (which must be a non-empty list) and unshift it to
+``toKey`` (which must be unsert or a list) as an atomic operation.
 
 ``Cache.range(key, start, [length])`` (TBA)
 ```````````````````````````````````````````
