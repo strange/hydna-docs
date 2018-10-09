@@ -67,6 +67,11 @@ handlers*.
 Example (current syntax)::
 
     {
+        "environment": {
+            "password": "secret",
+            "debug-mode": false,
+            "message-prefix": "data >>> "
+        },
         "channels": [
             {
                 "path": "/chat",
@@ -89,6 +94,11 @@ Example (current syntax)::
 Example (proposed new syntax)::
 
     {
+        "environment": {
+            "password": "secret",
+            "debug-mode": false,
+            "message-prefix": "data >>> "
+        },
         "handlers": [
             {
                 "path": "/chat",
@@ -124,7 +134,6 @@ contains the following:
 =============== =============================================================
 Attribute       Description
 =============== =============================================================
-``domain``      Name of the current domain (string)
 ``ref``         Unique reference of the connected client (string)
 ``ip``          IP address of the connected client (string)
 ``bindings``    Any **bindings** extracted from the path (object)
@@ -297,6 +306,152 @@ Example handler::
 
 API
 ---
+
+``Domain``
+~~~~~~~~~~~
+
+An api to interact with the domain.
+
+
+``Domain.hostname()``
+`````````````````
+
+Returns the name of domain. E.g. ``"test.hydna.net"``. This is equal to call
+``Domain.env("net.hostname")``.
+
+Example::
+
+    function onmessage(event) {
+        Channel.send(event.path, `${Domain.hostname()}: ${event.data}`);
+    }
+
+
+``Domain.env([name])``
+``````````````````````````
+
+Returns the value of the domain environmental variable ``name`` if provided, or
+all key/values if omitted.
+
+Predefined environmental variables
+
+======================== ======================================================
+Name                     Description
+======================== ======================================================
+``net.hostname``         The hostname of the domain (string)
+``net.tls.enabled``      Indicates if domain supports TLS or not (bool)
+``net.limit.sockets``    Max connections of domain (number)
+``net.limit.message``    The largest size of a message in bytes (number)
+``net.limit.requests``   The maximum number of simultaneously incomming
+                         HTTP-requests (number)
+``net.limit.response``   The largest size of an outgoing http-response in
+                         bytes (number)
+``script.timeout``       Number of milliseconds a script can run without
+                         throwing a timeout error (number)
+``cache.enabled``        Indicates if the Cache-module is enabled or not (bool)
+``cache.limit.size``     The maximum capacity (in bytes) of the domain
+                         cache (number)
+``cache.limit.key``      Cache key size limit in bytes (number)
+``cache.limit.value``    Cache value size limit in bytes (number)
+``http.enabled``         Indicates if the Http-module is enabled or not (bool)
+``http.limit.reqeusts``  The maximum number of outgoing HTTP-requests at
+                         any given point(number)
+``timezone.offset``      Returns the timezone offset of domain (number)
+======================== ======================================================
+
+Additional variables can be defined by user in ``mainfest.json``.
+
+Example::
+
+    const maxconns = Domain.env("net.limit.sockets");
+    console.log(`Domain support ${maxconns} of simultaneously connections");
+
+Example (list all environmental variables)::
+
+    const env = Domain.env();
+    console.log("Domain variables:");
+    console.log(env);
+
+Example (user-defined variables)::
+
+    function onmessage(event) {
+        const prefix = Domain.env("message-prefix");
+        Channel.send(event.path, prefix + event.data);
+    }
+
+Example (using user-defined variable "debug-mode")::
+
+    function onmessage(event) {
+        if (Domain.env("debug-mode")) {
+            console.log("Incomming message :: " + event.data);
+        }
+    }
+
+Example (using user-defined variable "password")::
+
+    function onopen(event) {
+        if (event.querystring === Domain.config("password")) {
+            event.allow();
+        } else {
+            event.deny();
+        }
+    }
+
+
+``Domain.restart([reason])``
+````````````````````````````
+
+Restarts the domain by gently disconnects all connections. The optional
+``reason`` is sent as reason to the client.
+
+The ``Cache`` is reset once started again.
+
+Example::
+
+    function onmessage(event) {
+        if (event.data === "restart") {
+            Domain.restart("Restarting domain...");
+        }
+    }
+
+
+``Domain.restartAfter(timeout, [reason])``
+````````````````````````````
+
+Restarts the domain by gently disconnects all connections after ms
+``timeout``. The optional ``reason`` is sent as reason to the client.
+
+The ``Cache`` is reset once started again.
+
+Please note that this command cannot be canceled.
+
+Example::
+
+    function onmessage(event) {
+        if (event.data === "restart") {
+            Channel.send("/", "The domaini will shutdown in 3 sec...");
+            Domain.restartAfter(3000, "Restarting domain...");
+        }
+    }
+
+
+``Domain.kill()``
+````````````````````````````
+
+Restarts the domain without waiting connections to be disconnected or to wait
+for running scripts to finish.
+
+Note: This command should be concidered to be used as a last resort.
+
+Example::
+
+    function onmessage(event) {
+        if (event.data === "kill") {
+            console.log("something is terriable wrong, killing domain");
+            Domain.kill();
+        }
+    }
+
+
 
 ``Channel``
 ~~~~~~~~~~~
