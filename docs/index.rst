@@ -130,7 +130,6 @@ Attribute       Description
 ``bindings``    Any **bindings** extracted from the path (object)
 ``path``        The current path (string)
 ``querystring`` The raw querystring (string)
-``transport``   Name of the transport (``http`` or ``ws``) (string)
 ``secure``      Booleand dictating whether the connection is encrypted
                 (boolean)
 ``allow()``     Allow the client to open the path (function)
@@ -187,7 +186,6 @@ Attribute       Description
 ``bindings``    Any **bindings** extracted from the path (object)
 ``path``        The current path (string)
 ``querystring`` The raw querystring (string)
-``transport``   Name of the transport (``http`` or ``ws``) (string)
 ``secure``      Booleand dictating whether the connection is encrypted
                 (boolean)
 ``data``        The data sent (string)
@@ -227,7 +225,6 @@ Attribute       Description
 ``bindings``    Any **bindings** extracted from the path (object)
 ``path``        The current path (string)
 ``querystring`` The raw querystring (string)
-``transport``   Name of the transport (``http`` or ``ws``) (string)
 ``secure``      Booleand dictating whether the connection is encrypted
                 (boolean)
 ``data``        The data sent (string)
@@ -253,7 +250,6 @@ Attribute       Description
 ``bindings``    Any **bindings** extracted from the path (object)
 ``path``        The current path (string)
 ``querystring`` The raw querystring (string)
-``transport``   Name of the transport (``http`` or ``ws``) (string)
 ``secure``      Booleand dictating whether the connection is encrypted
                 (boolean)
 ``data``        The data sent (string)
